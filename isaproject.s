@@ -109,10 +109,49 @@ mov r15, r14       // return
 // sort must allocate a stack
 // Save lr on stack and allocate space for local vars
 .label sort
-                   // Allocate stack
-// blr numelems    // count elements in ia[]
-                   // create nested loops to sort
-		   // Deallocate stack
+sub r13, r13, #20 //space for s, i, j, t, lr
+mov r1, r0 //move address of ia to r1
+blr numelems
+str r0, [r13, #0] //s = numelems(ia);
+mov r0, #0
+str r0, [r13, #4] //i = 0
+str r0, [r13, #8] //j = 0
+str r0, [r13, #12] //t = 0
+str r14, [r13, #16] //save lr on stack
+mov r0, r1 //move address of ia back to r0
+ldr r1, [r13, #0] //put s in r1
+ldr r2, [r13, #4] //put i in r2
+cmp r2, r1
+bgt endloop1
+.label loop1
+ldr r3, [r13, #8] //put j in r3
+sub r4, r1, #1 //s - 1
+sub r4, r4, r2 //(s-1)-i
+cmp r3, r4 //j < s-1-i
+bgt endloop2
+.label loop2
+add r6, r3, #1 //j+1
+ldr r5, [r0, r3] //ia[j]
+ldr r7, [r0, r6] //ia[j+1]
+cmp r5, r7
+ble skip1
+ldr r8, [r13, #12] //put t in r8
+mov r8, r5
+mov r5, r7
+mov r7, r8
+str r5, [r0, r3] //store new ia[j]
+str r7, [r0, r6] //store new ia[j+1]
+.label skip1
+add r3, r3, #1 //j++
+cmp r3, r4 // j < s-1-j
+blt loop2
+.label endloop2
+add r2, r2, #1
+cmp r2, r1 // i < s
+blt loop1
+.label endloop1
+ldr r14, [r13, #16] //restore lr
+add r13, r13, #20 //restore r13 stack
 mov r15, r14       // return - sort is a void function
 
 .text 0x700
