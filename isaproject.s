@@ -122,13 +122,13 @@ mov r0, r1 //move address of ia back to r0
 ldr r1, [r13, #0] //put s in r1
 ldr r2, [r13, #4] //put i in r2
 cmp r2, r1
-bgt endloop1
+bge endloop1
 .label loop1
 ldr r3, [r13, #8] //put j in r3
 sub r4, r1, #1 //s - 1
 sub r4, r4, r2 //(s-1)-i
 cmp r3, r4 //j < s-1-i
-bgt endloop2
+bge endloop2
 .label loop2
 add r6, r3, #1 //j+1
 ldr r5, [r0, r3] //ia[j]
