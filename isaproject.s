@@ -90,8 +90,18 @@ mov r15, r14       // return
 // numelems is a leaf function
 // If you only use r0, r1, r2, r3; you do not need a stack
 .label numelems
-mov r0, 0xa        // hardcode to return a 10
-.label break
+mov r1, #0 // c = 0
+ldr r2, [r0] // *ia in r2
+cmp r2, #0 // check if *ia != 0
+beq endnumelemswhile
+.label numelemswhile1
+add r1, r1, #1 //c++
+add r0, r0, #4 // increments *ia
+ldr r2, [r0] // puts next *ia value into r2
+cmp r2, #0
+bne numelemswhile1
+.label endnumelemswhile
+mov r0, r1 // sets r0 = c to return
 mov r15, r14       // return
 
 .text 0x600
