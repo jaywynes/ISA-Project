@@ -124,12 +124,16 @@ mov r15, r14       // return
 .label factorial
 sub r13, r13, #8 //space for n and lr
 str r14, [r13, #4] //save lr on stack
+str r0, [r13, #0] //n on stack
+ldr r0, [r13, #0] //put n in r0
+cmp r0, #1
+beq if1
+.label if1
 
                    // Allocate stack
 		   // implement algorithm
 //blr factorial    // factorial calls itself
 		   // Deallocate stack
-mov r0, 120        // hardcode 5! as return value
 mov r15, r14       // return
 
 .text 0x900
