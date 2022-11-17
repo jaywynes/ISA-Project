@@ -58,7 +58,7 @@ str r0, [r13, #0] //ia1
 str r1, [r13, #4] //ia2
 mov r3, #0
 str r3, [r13, #8] //s1
-mov r3, [r13, #12] //s2
+str r3, [r13, #12] //s2
 str r14, [r13, #16] //save lr on stack
 ldr r0, [r13, #0] //put ia1 in r0
 blr sum_array
