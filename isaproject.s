@@ -43,6 +43,7 @@ add r0, r0, #4 //*ia++
 ldr r2, [r0] //put *ia++ in r2
 cmp r2, #0 //check *ia != 0
 bne while1 //continue looping
+.label endwhile1
 mov r0, r1 //put s in r0 to return
 mov r15, r14       // return
 
@@ -52,17 +53,36 @@ mov r15, r14       // return
 // cmp_arrays must allocate a stack
 // Save lr on stack and allocate space for local vars
 .label cmp_arrays
-sub r13, r13, #12 //space for s1, s2, & lr
+sub r13, r13, #20 //space for ia1, ia2, s1, s2, & lr
+str r0, [r13, #0] //ia1
+str r1, [r13, #4] //ia2
 mov r3, #0
-str r3, [r13, #0] //s1
-mov r3, [r13, #4] //s2
-str r14, [r13, #8] //save lr on stack
+str r3, [r13, #8] //s1
+mov r3, [r13, #12] //s2
+str r14, [r13, #16] //save lr on stack
+ldr r0, [r13, #0] //put ia1 in r0
 blr sum_array
-
-
-                   // Allocate stack
-                   // Call sum_array two times
-		   // Deallocate stack
+str r0, [r13, #8] //s1 = sum_array(ia1);
+ldr r0, [r13, #4] //put ia2 in r0
+blr sum_array
+str r0, [r13, #12] //s2 = sum_array(ia2);
+ldr r0, [r13, #8] //put s1 in r0
+ldr r1, [r13, #12] //put s2 in r1
+cmp r0, r1
+beq cmp_eq    // s1 == s2 ?
+bne cmp_neq
+.label cmp_eq
+mov r0, #0   //put 0 as r0 return if s1 == s2
+.label cmp_neq
+cmp r0, r1  
+bgt cmp_gt   //perform s1 < s2 ? if s1 != s2
+ble cmp_le
+.label cmp_gt
+mov r0, #1  //if s1 > s2, r0 return is 1
+.label cmp_le
+mov r0, #-1 //if s1 <= s2, r0 return is -1
+ldr r14, [r13, #16] //restore r14
+add r13, r13, #20 //restore r13
 mov r15, r14       // return
 
 .text 0x500
@@ -102,6 +122,7 @@ mov r15, r14       // return
 // factorial must allocate a stack
 // Save lr on stack and allocate space for local vars
 .label factorial
+sub r13
                    // Allocate stack
 		   // implement algorithm
 //blr factorial    // factorial calls itself
