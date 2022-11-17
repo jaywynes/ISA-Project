@@ -122,7 +122,7 @@ mov r15, r14       // return
 // factorial must allocate a stack
 // Save lr on stack and allocate space for local vars
 .label factorial
-sub r13
+sub r13, r13, 
                    // Allocate stack
 		   // implement algorithm
 //blr factorial    // factorial calls itself
