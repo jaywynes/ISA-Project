@@ -159,11 +159,34 @@ mov r15, r14       // return - sort is a void function
 // smallest must allocate a stack
 // Save lr on stack and allocate space for local vars
 .label smallest
-                   // Allocate stack
-// blr numelems    // count elements in ia[]
-                   // create loop to find smallest
-mov r0, 2          // hardcode to return a 2
-		   // Deallocate stack
+sub r13, r13, #16 //space for s, sm, p, lr
+mov r1, r0 //move address of ia to r1
+blr numelems
+str r0, [r13, #0] //put s on stack
+ldr r0, [r1]
+str r0, [r13, #4] //put sm on stack
+mov r0, #0
+str r0, [r13, #8] //put p on stack
+str r14, [r13, #12] //save lr on stack
+ldr r0, [r13, #4] //put sm in r1
+ldr r2, [r13, #8] //put p in r2
+ldr r3, [r13, #0] //put s in r3
+mov r2, r1 //p = ia
+add r4, r1, r3 //r4 = ia+s
+cmp r2, r4
+bge endloop3
+.label loop3
+ldr r5, [r2] //*p
+cmp r5, r0 //*p < sm
+bge skip2
+mov r0, r5
+.label skip2
+add r2, r2, #4 //p++
+cmp r2, r4
+blt loop3
+.label endloop3
+ldr r14, [r13, #12] //restore r14
+add r13, r13, #16 //restore r13 stack
 mov r15, r14       // return
 
 .text 0x800
