@@ -6,6 +6,7 @@
 // Define address of printf
 .text 0x7000
 .label printf
+ker #0x11
 
 .data 0x100
 .label sia
@@ -25,7 +26,7 @@
 50
 0
 .label fmt1
-.string //sia[%d]: %d
+.string //comparison: %d
 .label fmt2
 .string //Something bad
 .text 0x300
