@@ -251,6 +251,45 @@ mov r0, 0
 str r0, [sp, 0]    // cav = 0;
 str r0, [sp, 4]    // n = 0;
 str r0, [sp, 8]    // sm1 = 0;
+
+// cav = cmp_arrays(sia, sib);
+mva r0, sia        // put address of sia in r0
+mva r1, sib        // put address of sib in r1
+blr cmp_arrays     // branch to cmp_arrays function
+str r0, [sp, 0]    // cav = result from cmp_arrays
+mva r0, fmt1
+blr printf
+
+// cav = cmp_arrays(sia, sia);
+mva r0, sia        // addy of sia into r0
+mva r1, sia        // addy of sia into r1 
+blr cmp_arrays // branch to cmp_arrays
+str r0, [sp, 0]
+mva r0, fmt1
+
+// sib[0] = 4;
+mva r4, sia // moves sia addy into r4
+str #4, [r4, #0] // changes r4[0] to = 4
+str r4, sia  // updates sia label with new r4
+
+// cav = cmp_arrays(sia, sib);
+mva r0, sia        // put address of sia in r0
+mva r1, sib        // put address of sib in r1
+blr cmp_arrays     // branch to cmp_arrays function
+str r0, [sp, 0]    // cav = result from cmp_arrays
+mva r0, fmt1
+blr printf
+
+// cav = cmp_arrays(ia, sib)
+mva r0, ia        // put address of ia in r0
+mva r1, sib        // put address of sib in r1
+blr cmp_arrays     // branch to cmp_arrays function
+str r0, [sp, 0]    // cav = result from cmp_arrays
+mva r0, fmt1
+blr printf
+
+// sort(ia)
+
 // printf("Something bad");
 // Kernel call to printf expects parameters
 // r1 - address of format string - "Something bad"
@@ -260,8 +299,7 @@ str r0, [sp, 8]    // sm1 = 0;
 // The code there generates the ker instruction
 // You call printf with
 // r0 - has address of format string - "Something bad"
-mva r0, fmt2
-blr printf
+
 //
 // for (int i = 0; i < 4; i++)
 //     printf("ia[%d]: %d", i, sia[i]);
@@ -289,11 +327,9 @@ str r0, [sp, 4]
 mva r0, sia        // put address of sia in r0
 blr smallest       // sm1 = smallest(sia)
 str r0, [sp, 8]    // store return value in sm1
-// cav = cmp_arrays_sia, sib);
-mva r0, sia        // put address of sia in r0
-mva r1, sib        // put address of sib in r1
-blr cmp_arrays
-str r0, [sp, 0]
+
+
+
 // Do not deallocate stack.
 // This leaves r13 with an address that can be used to dump memory
 // > d 0x4ff0 
