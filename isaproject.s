@@ -30,6 +30,10 @@
 .string //comparison: %d
 .label fmt2
 .string //Something bad
+.label fmt3
+.string // Nice sort and smallest
+.label fmt4
+.string //ia[%d]: %d\n
 .text 0x300
 // r0 has ia - address of null terminated array
 // sum_array is a leaf function
@@ -249,15 +253,16 @@ str r2, [r13, #12] //ia[0] = 2
 mov r2, #0
 str r2, [r13, #16] //ia[0] = 2
 
-sbi sp, sp, 16     // allocate space for stack
+sbi sp, sp, 20     // allocate space for stack
                    // [sp,0] is int cav
                    // [sp,4] is int n
                    // [sp,8] is int sm1
-str lr, [sp, 12]   // [sp,12] is lr (save lr)
+str lr, [sp, 16]   // [sp,12] is lr (save lr)
 mov r0, 0
 str r0, [sp, 0]    // cav = 0;
 str r0, [sp, 4]    // n = 0;
 str r0, [sp, 8]    // sm1 = 0;
+str r0, [sp, 12]   // sm2 = 0
 
 // cav = cmp_arrays(sia, sib);
 mva r0, sia        // put address of sia in r0
@@ -302,6 +307,140 @@ ldr r1, [sp, 0]
 blr printf
 
 // sort(ia)
+mva r0, ia  // moves ia addy into r0
+blr sort  // branch to sort function, no return
+
+// n = numelems(ia)
+mva r0, ia  // moves ia addy into r0
+blr numelems  // branch to numelems
+str r0, [sp, 4]  // set result = n
+
+// for (int i = 0: i < n; i++) {
+//      printf("ia[%d]: %d\n", i, ia[i])   
+mva r4, ia //sets addy of ia into r4
+ldr r5, #0 // r5 = i
+.label printloop1
+cmp r5, [sp, 4] // compares i to n
+bge printendloop1  // if i >= n, branches to end of loop
+str r6, [r4, r5] // takes the ia[i] value and stores it in r6
+mva r0, fmt4  // sets r0 as format
+mva r1, r5  // sets i as first arg
+mva r2, r6  // sets ia[i] as second arg
+blr printf
+add r5, r5, #1 // increments r5 by 1
+blr printloop1  //branches back to loop start
+.label printendloop1
+
+// sort(sia)
+mva r0, sia // sia addy into r0
+blr sort // branch to void sort function
+
+// n = numelems(sia)
+mva r0, sia  // sia addy into r0
+blr numelems  // branch to numelems
+str r0, [sp, 4]  // sets output to n (sp , 4)
+
+// for (int i = 0: i < n; i++) {
+//      printf("sia[%d]: %d\n", i, ia[i])
+mva r4, sia //sets addy of ia into r4
+ldr r5, #0 // r5 = i
+.label printloop2
+cmp r5, [sp, 4] // compares i to n
+bge printendloop2  // if i >= n, branches to end of loop
+str r6, [r4, r5] // takes the ia[i] value and stores it in r6
+mva r0, fmt4  // sets r0 as format
+mva r1, r5  // sets i as first arg
+mva r2, r6  // sets ia[i] as second arg
+blr printf
+add r5, r5, #1 // increments r5 by 1
+blr printloop2  //branches back to loop start
+.label printendloop2
+
+// sm1 = smallest(ia)
+// sm1 = [sp, 8]
+mva r0, ia  // ia addy to r0
+blr smallest
+str r0, [sp, 8]
+
+// sm2 = smallest(sia)
+// sm2 = [sp, 12]
+mva r0, sia
+blr smallest
+str r0, [sp, 12]
+
+// printf("smallest(ia): %d\n", sm1);
+mva r0, fmt1
+mva r1, [sp, 8]
+mva r2, #
+blr printf
+
+// printf("smallest(sia): %d\n", sm2);
+mva r0, fmt1
+mva r1, [sp, 12]
+mva r2, #
+blr printf
+
+// if (sm1 != ia[0])
+//    printf("Something bad\n");
+// else
+//    printf("Nice sort and smallest\n");
+mva r0, ia
+cmp [r0, #0], [sp, 8]
+bne badprint1
+mva r0, fmt3
+mva r1, #
+mva r2, #
+blr printf
+blr badskip1
+.label badprint1
+mva r0, fmt2
+mva r1, #
+mva r2, #
+.label badskip1
+
+// if (sm2 != sia[0])
+//  printf("Something bad\n");
+// else
+//  printf("Nice sort and smallest\n");
+mva r0, sia
+cmp [r0, #0], [sp, 12]
+bne badprint2
+mva r0, fmt3
+mva r1, #
+mva r2, #
+blr printf
+blr badskip2
+.label badprint2
+mva r0, fmt2
+mva r1, #
+mva r2, #
+.label badskip2
+
+// n = factorial(4)
+// [sp, 4] = n
+mva r0, #4
+blr factorial
+str r0, [sp, 4]
+
+// printf("factorial(4) ia: %d\n", n);
+mva r0, fmt1
+mva r1, [sp, 4]
+mva r2, #
+blr printf
+
+// n = factorial(7)
+// [sp, 4] = n
+mva r0, #7
+blr factorial
+str r0, [sp, 4]
+
+// printf("factorial(4) ia: %d\n", n);
+mva r0, fmt1
+mva r1, [sp, 4]
+mva r2, #
+blr printf
+
+
 
 .label end
 bal end
