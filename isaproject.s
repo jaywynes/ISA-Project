@@ -286,7 +286,6 @@ str r4, sia  // updates sia label with new r4
 // cav = cmp_arrays(sib, sia);
 mva r0, sib        // put address of sib in r0
 mva r1, sia        // put address of sia in r1
-.label bp
 blr cmp_arrays     // branch to cmp_arrays function
 str r0, [sp, 0]    // cav = result from cmp_arrays
 mva r0, fmt1
