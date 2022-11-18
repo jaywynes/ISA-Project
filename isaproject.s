@@ -194,19 +194,29 @@ mov r15, r14       // return
 // factorial must allocate a stack
 // Save lr on stack and allocate space for local vars
 .label factorial
+cmp r0, #0 // if arg is 0, return n
+beq factif1 // if true
+mov r3, r0 // saves n into r3
+sub r0, r0, #1 //decriments n and performs recursive call on n
 sub r13, r13, #8 //space for n and lr
-str r14, [r13, #4] //save lr on stack
-str r0, [r13, #0] //n on stack
-ldr r0, [r13, #0] //put n in r0
-cmp r0, #1
-beq if1
-.label if1
+str r14, [r13, #4] // Saves lr into 1st space
+str r3, [r13] //stores current n value into stack
+blr factorial //recursion
+ldr r3, [r13] //relaods previous n value
+mul r0, r3, r0 // multiple returned value of factorial(n-1) by n
+ldr r14, [r13, #4] // restores lr
+add r13, r13, #8 // deallocates memory space after restoring desired values
+mov r15, r14 //return
+.label factif1 // if true
+mov r0, #1 // sets r0 = 1
+mov r15, r14 // return
 
-                   // Allocate stack
-		   // implement algorithm
-//blr factorial    // factorial calls itself
-		   // Deallocate stack
-mov r15, r14       // return
+            // Allocate stack
+		    // implement algorithm
+            //blr factorial    
+            // factorial calls itself
+            // Deallocate stack
+            // return
 
 .text 0x900
 // This sample main implements the following
@@ -220,6 +230,18 @@ mov r15, r14       // return
 //     cav = cmp_arrays(sia, sib);
 // }
 .label main
+sub r13, r13, #20 // allocates space for *ia
+mov r2, #2 
+str r2, [r13, #0] //ia[0] = 2
+mov r2, #3
+str r2, [r13, #4] //ia[0] = 2
+mov r2, #5
+str r2, [r13, #8] //ia[0] = 2
+mov r2, #1
+str r2, [r13, #12] //ia[0] = 2
+mov r2, #0
+str r2, [r13, #16] //ia[0] = 2
+
 sbi sp, sp, 16     // allocate space for stack
                    // [sp,0] is int cav
                    // [sp,4] is int n
