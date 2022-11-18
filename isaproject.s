@@ -6,7 +6,6 @@
 // Define address of printf
 .text 0x7000
 .label printf
-ker #0x11
 
 .data 0x100
 .label sia
@@ -259,6 +258,7 @@ mva r1, sib        // put address of sib in r1
 blr cmp_arrays     // branch to cmp_arrays function
 str r0, [sp, 0]    // cav = result from cmp_arrays
 mva r0, fmt1
+ldr r1, [sp, 0]
 blr printf
 
 // cav = cmp_arrays(sia, sia);
@@ -266,11 +266,14 @@ mva r0, sia        // addy of sia into r0
 mva r1, sia        // addy of sia into r1 
 blr cmp_arrays // branch to cmp_arrays
 str r0, [sp, 0]
+ldr r1, [sp, 0]
 mva r0, fmt1
+blr printf
 
 // sib[0] = 4;
 mva r4, sia // moves sia addy into r4
-str #4, [r4, #0] // changes r4[0] to = 4
+mov r5, #4
+str r5, [r4, #0] // changes r4[0] to = 4
 str r4, sia  // updates sia label with new r4
 
 // cav = cmp_arrays(sia, sib);
@@ -279,14 +282,16 @@ mva r1, sib        // put address of sib in r1
 blr cmp_arrays     // branch to cmp_arrays function
 str r0, [sp, 0]    // cav = result from cmp_arrays
 mva r0, fmt1
+ldr r1, [sp, 0]
 blr printf
 
 // cav = cmp_arrays(ia, sib)
-mva r0, ia        // put address of ia in r0
+mva r0, r13        // put address of ia in r0
 mva r1, sib        // put address of sib in r1
 blr cmp_arrays     // branch to cmp_arrays function
 str r0, [sp, 0]    // cav = result from cmp_arrays
 mva r0, fmt1
+ldr r1, [sp, 0]
 blr printf
 
 // sort(ia)
