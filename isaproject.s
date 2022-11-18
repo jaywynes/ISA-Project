@@ -8,6 +8,7 @@
 .label printf
 
 .data 0x100
+//sum sia is 228
 .label sia
 50
 43
@@ -16,6 +17,7 @@
 -10
 50
 0
+//sum sib is 678
 .label sib
 500
 43
@@ -73,14 +75,18 @@ beq cmp_eq    // s1 == s2 ?
 bne cmp_neq
 .label cmp_eq
 mov r0, #0   //put 0 as r0 return if s1 == s2
+bal cmp_end
 .label cmp_neq
 cmp r0, r1  
 bgt cmp_gt   //perform s1 < s2 ? if s1 != s2
 ble cmp_le
 .label cmp_gt
 mov r0, #1  //if s1 > s2, r0 return is 1
+bal cmp_end
 .label cmp_le
 mov r0, #-1 //if s1 <= s2, r0 return is -1
+bal cmp_end
+.label cmp_end
 ldr r14, [r13, #16] //restore r14
 add r13, r13, #20 //restore r13
 mov r15, r14       // return
@@ -231,6 +237,7 @@ mov r15, r14 // return
 // }
 .label main
 sub r13, r13, #20 // allocates space for *ia
+//sum ia is 12
 mov r2, #2 
 str r2, [r13, #0] //ia[0] = 2
 mov r2, #3
@@ -276,9 +283,10 @@ mov r5, #4
 str r5, [r4, #0] // changes r4[0] to = 4
 str r4, sia  // updates sia label with new r4
 
-// cav = cmp_arrays(sia, sib);
-mva r0, sia        // put address of sia in r0
-mva r1, sib        // put address of sib in r1
+// cav = cmp_arrays(sib, sia);
+mva r0, sib        // put address of sib in r0
+mva r1, sia        // put address of sia in r1
+.label bp
 blr cmp_arrays     // branch to cmp_arrays function
 str r0, [sp, 0]    // cav = result from cmp_arrays
 mva r0, fmt1
